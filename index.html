@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO DO LIST</title>
+</head>
+<body>
+    <h1>ENTER YOUR ACTIVITIES</h1>
+    <input id = "date" type="date">
+    <input id = "input" type="text">
+    <button onclick="addtodo()"> ADD </button>
+    <div id="refresh">
+    <script>
+        let todos;
+        let savedtodos = JSON.parse(localStorage.getItem('key'));
+        if(Array.isArray(savedtodos))
+        {
+            todos = savedtodos;
+        }else{
+            todos =[{
+            todotitle:'play time',
+            todate:'2021-03-09',
+            id:'id1'},
+            {
+            todotitle:'study time',
+            todate:'2021-04-08',
+            id: 'id2'},
+            {
+            todotitle:'eat',
+            todate:'2021-06-09',
+            id: 'id3'}];
+        }
+        
+        // create
+        function create(text,duedate)
+        {
+            const id = new Date().getTime();
+            todos.push(
+            {
+                todotitle:text,
+                todate:duedate,
+                id:id
+            }
+            );
+            savetodos();
+        }
+        //delete
+        function removetodo(todel)
+        {
+            todos = todos.filter(function (element)
+            {
+                if(element.id == todel){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+            );
+            savetodos();
+            
+        }
+        function addtodo()
+        {
+            let text = document.getElementById('input');
+            text = text.value;
+            let duedate = document.getElementById('date').value;
+            create(text,duedate);
+            render();
+        }
+        function deletetodo(event)
+        {
+            let delbutton = event.target;
+            let todel = delbutton.id;
+            removetodo(todel);
+            render();
+        }
+        function savetodos()
+        {
+            localStorage.setItem('key',JSON.stringify(todos))
+        }
+        function editing(temp)
+        {
+            //removes existing element
+            let editbutton = event.target;
+            let edid = editbutton.id;
+            console.log(edid);
+            let x = document.getElementById(edid);
+            x.innerText = '';
+            removetodo();
+            deletion(temp);
+            //newbox
+            let updatebox = document.createElement('input');
+            updatebox.setAttribute("type", "text");
+            updatebox.setAttribute("id","x1");
+            x.appendChild(updatebox);
+            let w = document.getElementById('x1');
+            //updatedate
+            let datebox = document.createElement('input');
+            datebox.setAttribute("id", "upda");
+            datebox.setAttribute("type", "date");
+            x.appendChild(datebox);
+            let z = document.getElementById('upda')
+            //updatebutton
+            let updatebutton = document.createElement('button');
+            updatebutton.innerText = 'Update';
+            updatebutton.setAttribute("id", "x2");
+            updatebutton.addEventListener('click',function()
+            {
+                updatebtn(w,z,temp);
+            });
+            x.appendChild(updatebutton);
+            
+        }
+        function updatebtn(w,z,temp)
+        {
+            a = w.value;
+            b = z.value;
+            deletion(a,b,temp);
+            render();
+            savetodos();
+        }
+        function deletion(a,b,temp)
+        {
+           todos.forEach(element =>{
+                if(element.todotitle === temp)
+                {
+                    element.todotitle = a;
+                    element.todate = b;
+                }
+            });
+            savetodos();
+        }
+        function render()
+        {
+            list = document.getElementById('refresh');
+            list.innerText = '';
+            todos.forEach(element => {
+            let div = document.createElement('div');
+            div.id = Math.ceil(Math.random()*1000000);
+            div.innerText = element.todotitle + '   ' + element.todate;
+            list.appendChild(div);
+            //editbutton
+            let btn = document.createElement('div');
+            const editbutton = document.createElement('button');
+            editbutton.innerText = 'edit';
+            editbutton.style = 'align-items: flex-end;';
+            editbutton.setAttribute('class','edit-style') ;
+            let temp = element.todotitle;
+            editbutton.addEventListener('click',function()
+            {
+                 editing(temp);
+            });
+            editbutton.id = div.id;
+            div.appendChild(editbutton);
+            //deletebutton
+            const delbutton = document.createElement('button');
+            delbutton.innerText = 'Delete';
+            delbutton.style ='margin-left: 20px;';
+            delbutton.id = element.id;
+            delbutton.onclick = deletetodo;
+            div.appendChild(delbutton);
+            let ck = document.createElement('input');
+            ck.setAttribute('type','checkbox');
+            div.append(ck);
+            
+        });
+        }
+        render();
+    </script>
+    </div>
+</body>
+</html>
